@@ -1,8 +1,34 @@
 
 # Systemd-CryptSetup operation combined with initramfs-tools
 
-## Installation:
 ### TLDR:
+
+Check if Ubuntu recognize your TPM chip
+
+    systemd-cryptenroll --tpm2-device=list
+
+Check current LUKS info
+
+    sudo cryptsetup luksDump /dev/nvme0n1p3
+
+Enroll TPM as unlocker
+
+    sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/nvme0n1p3
+
+Check current LUKS info after TPM enrollment
+
+    sudo cryptsetup luksDump /dev/nvme0n1p3
+
+Edit /etc/crypttab to something like
+
+    nvme0n1p3_crypt UUID=ff098ab6-2a46-11ee-be56-0242ac120002 none luks,discard,tpm2-device=auto
+
+Run
+
+    sudo ./install.sh
+
+### Slightly longer:
+
 If you have a LUKS container and want it to unlock, without reading the scripts, run `sudo ./install.sh`.  This will:
     1. patch cryptsetup scripts, include necessary components in the initramfs
     2. update the initramfs
